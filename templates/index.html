@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineBot | AI Movie Recommendations</title>
+    <!-- Google Fonts for Modern Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons for elegant UI graphics -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="/static/style.css">
+    <!-- Read local storage synchronously so no theme switching flashes happen -->
+    <script>
+        const initTheme = localStorage.getItem("theme") || "dark";
+        document.documentElement.setAttribute("data-theme", initTheme);
+    </script>
+</head>
+<body>
+    <!-- Abstract Animated Background Blobs -->
+    <div class="blob shape-1"></div>
+    <div class="blob shape-2"></div>
+    <div class="blob shape-3"></div>
+
+    <main class="chat-container glassbkg">
+        <header class="chat-header">
+            <div class="logo">
+                <i class="ph-fill ph-film-strip" id="logo-icon"></i>
+                <div class="brand">
+                    <h1>CineBot Assistant</h1>
+                    <span class="status pulse">Online & Ready</span>
+                </div>
+            </div>
+            
+            <div class="header-controls">
+                <button id="theme-toggle" class="icon-toggle bounce-anim" aria-label="Toggle Theme">
+                    <i class="ph-fill ph-sun" id="theme-icon"></i>
+                </button>
+            </div>
+        </header>
+
+        <section id="chatbox" class="chat-area">
+            <!-- Initial Welcome Message -->
+            <div class="message bot glow-in">
+                <div class="avatar"><i class="ph ph-robot"></i></div>
+                <div class="msg-content">
+                    <p>Hi there! 👋 I'm CineBot, your personal cinematic expert powered by Semantic AI. Tell me what vibe you're in the mood for, and I'll find your perfect movie match!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dynamic Typing Indicator (Hidden by default) -->
+        <div id="typing-indicator" class="typing-container hidden">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+
+        <footer class="chat-input-area">
+            <div class="input-wrapper">
+                <input type="text" id="message" placeholder="e.g. 'I want an emotional sci-fi movie...'" autocomplete="off" aria-label="Type your message">
+                <button id="send-btn" class="send-btn" onclick="sendMessage()" aria-label="Send">
+                    <i class="ph-fill ph-paper-plane-tilt"></i>
+                </button>
+            </div>
+            
+            <!-- Exact Custom Requested Subtitles -->
+            <small class="footer-text">Made by TE AIML students and Designed by NIKITA WAGH</small>
+        </footer>
+    </main>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual Environments
+venv/
+env/
+.env
+.venv/
+
+# Machine Learning Generated files
+model/faiss_index.bin
+model/movie_data.pkl
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+*.swp

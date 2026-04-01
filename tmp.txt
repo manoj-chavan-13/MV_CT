@@ -1,0 +1,88 @@
+import pandas as pd
+
+movies = pd.read_csv("movies.csv")
+ratings = pd.read_csv("ratings.csv")
+tags = pd.read_csv("tags.csv")
+
+movies.head()
+---
+# Merge tags with movies
+tags_grouped = tags.groupby("movieId")["tag"].apply(lambda x: " ".join(x)).reset_index()
+
+movies = movies.merge(tags_grouped, on="movieId", how="left")
+
+# Fill NaN tags
+movies["tag"] = movies["tag"].fillna("")
+
+# Create rich content
+movies["content"] = movies["title"] + " " + movies["genres"] + " " + movies["tag"]
+
+movies = movies[["movieId", "title", "content"]]
+
+movies.head()
+---
+!pip install sentence-transformers faiss-cpu
+---
+from sentence_transformers import SentenceTransformer
+
+model = SentenceTransformer('all-MiniLM-L6-v2')
+
+embeddings = model.encode(movies['content'].tolist(), show_progress_bar=True)
+---
+import faiss
+import numpy as np
+
+dimension = embeddings.shape[1]
+
+index = faiss.IndexFlatL2(dimension)
+index.add(np.array(embeddings))
+
+print("Movies indexed:", index.ntotal)
+---
+# Compute average ratings
+avg_ratings = ratings.groupby("movieId")["rating"].mean().reset_index()
+
+movies = movies.merge(avg_ratings, on="movieId", how="left")
+movies["rating"] = movies["rating"].fillna(0)
+---
+def recommend_movies(query, top_k=5):
+    query_embedding = model.encode([query])
+
+    distances, indices = index.search(np.array(query_embedding), top_k * 3)
+
+    candidates = movies.iloc[indices[0]].copy()
+
+    # Boost with ratings
+    candidates["score"] = (1 / (1 + distances[0])) + 0.3 * candidates["rating"]
+
+    results = candidates.sort_values(by="score", ascending=False).head(top_k)
+
+    return results[["title", "rating"]]
+---
+def explain(query, df):
+    print(f"\n🎯 Based on: '{query}'\n")
+
+    for _, row in df.iterrows():
+        print(f"🎬 {row['title']} (⭐ {round(row['rating'],2)})")
+        print(f"   → Matches themes like: {query}\n")
+---
+def explain(query, df):
+    print(f"\n🎯 Based on: '{query}'\n")
+
+    for _, row in df.iterrows():
+        print(f"🎬 {row['title']} (⭐ {round(row['rating'],2)})")
+        print(f"   → Matches themes like: {query}\n")
+---
+query = "emotional sci-fi like Interstellar"
+
+recs = recommend_movies(query)
+explain(query, recs)
+---
+while True:
+    q = input("\nEnter your mood: ")
+
+    if q.lower() == "exit":
+        break
+
+    recs = recommend_movies(q)
+    explain(q, recs)
